@@ -1,0 +1,68 @@
+import React, { useState } from 'react';
+import './App.css'; // Don't forget to import
+
+function App() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await fetch('http://localhost:8086/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setMessage('Login successful!');
+      } else {
+        setMessage('Login failed: ' + data.message);
+      }
+    } catch (error) {
+      setMessage('Error connecting to server');
+    }
+  };
+
+  return (
+    <div className="container">
+      <h2>Login Page</h2>
+      
+      <form onSubmit={handleSubmit}>
+        <div className="input-group">
+          <label>Username:</label>
+          <input
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+        </div>
+        
+        <div className="input-group">
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        
+        <button type="submit">Login</button>
+      </form>
+      
+      {message && (
+        <div className={`message ${message.includes('successful') ? 'success' : 'error'}`}>
+          {message}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
